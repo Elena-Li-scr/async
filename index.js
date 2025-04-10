@@ -5,6 +5,7 @@ let error = document.querySelector(".error");
 
 try {
   button.addEventListener("click", function () {
+    error.style.display = "none";
     list.style.display = "none";
     button.style.display = "none";
     setTimeout(() => {
@@ -14,10 +15,13 @@ try {
     start.style.display = "block";
     setTimeout(async () => {
       try {
-        let responce = await fetch(
+        let response = await fetch(
           "https://jsonplaceholder.typicode.com/users"
         );
-        let users = await responce.json();
+        if (!response.ok) {
+          throw new Error("Failed to load users.");
+        }
+        let users = await response.json();
         for (let user of users) {
           const item = document.createElement("li");
           item.textContent = user.name;
@@ -26,10 +30,18 @@ try {
         start.style.display = "none";
         list.style.display = "block";
       } catch (fetchError) {
-        error.innerHTML = "Ошибка при загрузке данных: " + fetchError.message;
+        start.style.display = "none";
+        list.style.display = "none";
+        error.style.display = "block";
+        error.textContent = "Failed to load users.";
+        error.style.color = "red";
       }
     }, 2000);
   });
 } catch (mainError) {
-  error.innerHTML = "Ошибка: " + mainError.message;
+  start.style.display = "none";
+  list.style.display = "none";
+  error.style.display = "block";
+  error.textContent = "Failed to load users.";
+  error.style.color = "red";
 }
